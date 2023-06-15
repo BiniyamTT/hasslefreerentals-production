@@ -8,6 +8,8 @@ from flask_session import Session
 from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
+from functools import wraps
+
 
 #from telethon import TelegramClient, errors, events, sync
 #from telethon.tl.types import InputPhoneContact
@@ -17,7 +19,7 @@ import argparse
 import asyncio
 from getpass import getpass
 
-from helpers import apology, login_required, lookup, usd
+
 
 API_ID = 29475974
 API_HASH = '7b1f8f4bdfa04b8c3ec558275e2bfdc8'
@@ -34,9 +36,6 @@ Breadcrumbs(app=app)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-# Custom filter
-app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -101,6 +100,19 @@ CAT =   {
     "Trucks and Trailers":["Flat Bed Trucks", "Dump Trucks", "Low-bed Trucks"]
     }
 
+def login_required(f):
+    """
+    Decorate routes to require login.
+
+    https://flask.palletsprojects.com/en/1.1.x/patterns/viewdecorators/
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.after_request
 def after_request(response):
@@ -147,9 +159,8 @@ async def sendmsg(phonenumber, msg):
         client.disconnect()
 """
 
-# Home page > index.html> /
+
 @app.route("/")
-@register_breadcrumb(app, '.', 'Home')
 def index():
     return render_template("index.html", CAT = CAT)
 
