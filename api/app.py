@@ -9,9 +9,9 @@ from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from telethon import TelegramClient, errors, events, sync
-from telethon.tl.types import InputPhoneContact
-from telethon import functions, types
+#from telethon import TelegramClient, errors, events, sync
+#from telethon.tl.types import InputPhoneContact
+#from telethon import functions, types
 
 import argparse
 import asyncio
@@ -110,7 +110,7 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-
+"""
 async def isontg(phone_no):
     client = TelegramClient('anon', API_ID, API_HASH)
     await client.connect()        
@@ -129,8 +129,9 @@ async def isontg(phone_no):
         raise
     finally:
         client.disconnect()
+"""
 
-
+"""
 async def sendmsg(phonenumber, msg):
     client = TelegramClient('anon', API_ID, API_HASH)
     await client.connect()
@@ -144,7 +145,7 @@ async def sendmsg(phonenumber, msg):
         raise
     finally:
         client.disconnect()
-
+"""
 
 # Home page > index.html> /
 @app.route("/")
