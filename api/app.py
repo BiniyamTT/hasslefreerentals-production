@@ -1,6 +1,7 @@
 import os
 import datetime
 import json
+import sqlite3
 
 from cs50 import SQL
 from flask import Flask, flash, jsonify,redirect, render_template, request, session
@@ -9,21 +10,6 @@ from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
-
-
-#from telethon import TelegramClient, errors, events, sync
-#from telethon.tl.types import InputPhoneContact
-#from telethon import functions, types
-
-import argparse
-import asyncio
-from getpass import getpass
-
-
-
-API_ID = 29475974
-API_HASH = '7b1f8f4bdfa04b8c3ec558275e2bfdc8'
-PHONE_NUMBER = '+251993822334'
 
 # Configure application
 app = Flask(__name__)
@@ -136,44 +122,6 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-"""
-async def isontg(phone_no):
-    client = TelegramClient('anon', API_ID, API_HASH)
-    await client.connect()        
-    try:
-        contact = InputPhoneContact(client_id = 0, phone = phone_no, first_name="", last_name="")
-        contacts = await client(functions.contacts.ImportContactsRequest([contact]))
-        print(contacts)
-        id = contacts.to_dict()['users'][0]['id']
-        if id:
-            return id
-    except IndexError as e:
-        return 1
-    except TypeError as e:
-        return 1
-    except:
-        raise
-    finally:
-        client.disconnect()
-"""
-
-"""
-async def sendmsg(phonenumber, msg):
-    client = TelegramClient('anon', API_ID, API_HASH)
-    await client.connect()
-    try:
-        message = await client.send_message(phonenumber, msg)
-    except IndexError as e:
-        return 1
-    except TypeError as e:
-        return 1
-    except:
-        raise
-    finally:
-        client.disconnect()
-"""
-
-
 @app.route("/")
 def index():
     return render_template("index.html", CAT = CAT)
@@ -213,19 +161,6 @@ def register():
         phonenumber = request.form.get("phonenumber")
         usertype = request.form.get("usertype")
         id = '123'
-        '''
-        id = asyncio.run(isontg(phonenumber))
-        print('--------------------------')
-        print(id)
-        print('--------------------------')
-        if id == 1:
-            flash ("It seems your phone is not registered on telegram which will be used for communication, Please register and try again.")
-            return render_template('register.html', usertypes = USER_TYPES)
-        else:
-            print('Id is not 1---- database execution ready')
-            message = f'Hello {username},\nWelcome to hasslefreerentals. Start the following bot to use telegram for machinery related inquiries. @hasslefreerentals_bot'
-            sentmsg = asyncio.run(sendmsg(phonenumber, message))
-        '''
         db.execute("INSERT INTO users(username, hash, email, phonenumber, telegram_id, usertype) VALUES(?, ?, ?, ?, ?, ?)", username, hash, email, phonenumber, id, usertype)
         # Redirect to login page
         flash("You were successfully registered, log in to continue")
@@ -340,3 +275,6 @@ def equipmentdetail():
         rows = db.execute("SELECT * FROM equipments WHERE sub_category = ?", sub_cat)
         print(rows)
         return render_template("equipmentdetail.html", sub_category = sub_cat, CAT = CAT, equipments = rows)
+    
+if __name__ == "__main__":
+    app.run(debug=False)
