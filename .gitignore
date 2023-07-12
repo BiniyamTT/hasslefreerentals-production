@@ -2,6 +2,8 @@
 *.log
 *.pyc
 __pycache__
+flask_session
+hasslefreerentals.session
 
 # Environments 
 .env 

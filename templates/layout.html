@@ -53,18 +53,6 @@
                 </div>
             </div>
         </nav>
-        <!--
-        <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    {%- for breadcrumb in breadcrumbs -%}
-                        <li class="breadcrumb-item active" aria-current="page"><a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a></li>
-                        {{ '/' if not loop.last }}
-                    {%- endfor -%}
-                </ol>
-            </nav>
-        </div>
-        -->
         {% if get_flashed_messages() %}
             <header>
                 <div class="alert alert-primary mb-0 text-center" role="alert">
