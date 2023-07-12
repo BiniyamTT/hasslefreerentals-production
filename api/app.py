@@ -2,9 +2,10 @@ import os
 import datetime
 import json
 import sqlite3
+import requests
 
 from cs50 import SQL
-from flask import Flask, flash, jsonify,redirect, render_template, request, session
+from flask import Flask, flash, jsonify,redirect, render_template, request, session, make_response
 from flask_session import Session
 from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
 from tempfile import mkdtemp
@@ -28,7 +29,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-
+apiSecret = "1ccdc141f237b2c18dfb44dc7716095c2f1ada70"
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///rentals.db",connect_args={'check_same_thread': False})
@@ -113,7 +114,6 @@ def apology(message, code=400):
         return s
     return render_template("apology.html", top=code, bottom=escape(message)), code
 
-
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -125,6 +125,40 @@ def after_request(response):
 @app.route("/")
 def index():
     return render_template("index.html", CAT = CAT)
+
+# Send OTP to user for verification
+@app.route('/sendotp', methods=['POST'])
+def sendotp():
+    if request.method == 'POST':
+        data = request.form.get('data')
+        print('***********************************************')
+        print(data)
+        message = {
+            "secret": apiSecret,
+            "type": "sms",
+            "mode": "devices",
+            "device": "00000000-0000-0000-0aa2-9d90a03739af",
+            "sim": 2,
+            "phone": data,
+            "message": "Your OTP is {{otp}}"}
+        r = requests.post(url = "https://hahu.io/api/send/otp", params = message)
+        print(r.json())
+        return ()
+
+
+# Verify user input otp
+def verifyotp(otp):
+    r = requests.get(url = "https://hahu.io/api/get/otp", params = {
+        "secret": apiSecret,
+        "otp": otp
+    })
+  
+    # Get status code from verification and return it
+    result = r.json()
+    statuscode = result['status']
+    print(statuscode)
+    return(statuscode)
+
 
 
 # Register Users to Webapp
@@ -154,6 +188,14 @@ def register():
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("passwords dont match", 403)
         
+        # Ensure if phone number is provided 
+        elif not request.form.get("phonenumber"):
+            return apology("must provide phonenumber", 403)  
+        
+        # Ensure if phonenumber is verified
+        elif verifyotp(request.form.get("otp")) != 200:
+            return apology("OTP either invalid or expired, try again", 403)
+                
         # Register username and password hash into db
         username = request.form.get("username")
         hash = generate_password_hash(request.form.get("password"))
@@ -195,7 +237,7 @@ def login():
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
             return apology("invalid username and/or password", 403)
-
+      
         # Remember which user has logged in
         session["user_id"] = rows[0]["user_id"]
         session["usertype"] = rows[0]["usertype"]
@@ -203,6 +245,8 @@ def login():
         # Redirect user to home page
         flash("Successfully logged in")
         return redirect('/')
+        
+               
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
@@ -277,4 +321,4 @@ def equipmentdetail():
         return render_template("equipmentdetail.html", sub_category = sub_cat, CAT = CAT, equipments = rows)
     
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
