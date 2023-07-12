@@ -88,10 +88,12 @@
       <h2 class="bolder">Categories</h2>
     </div>
     <h3 class="mb-5">Browse the largest fleet in the industry</h3>
-    <div class="row d-flex justify-content-between">
-      {% for cat in CAT %}
-        <div class="col-md-2 boxy p-3 m-3">{{cat}}</div>
-      {% endfor %}
-    </div>
+    <form onclick="submit()" action="/equipmentdetail" method="post" id="form-element">
+      <div class="row d-flex justify-content-between">
+        {% for cat in CAT %}
+          <div class="col-md-2 boxy p-3 m-3">{{cat}}</div>
+        {% endfor %}
+      </div>
+  </form>
   </section>
 {% endblock %}

@@ -43,7 +43,6 @@ db.execute  ("""
                     hash TEXT NOT NULL,
                     email TEXT NOT NULL,
                     phonenumber TEXT NOT NULL,
-                    telegram_id INTEGER,
                     usertype TEXT NOT NULL
                 )
             """)
@@ -277,6 +276,18 @@ def screturn():
     else:
         subcat = []
     return jsonify(subcat)
+
+
+@app.route("/searchequipments")
+def searchequipments():
+    print('************************')
+    q = request.args.get("q")
+    if q:
+        result = db.execute("SELECT brand FROM equipments WHERE brand LIKE ? or category LIKE ? or sub_category LIKE ? or model LIKE ?","%"+q+"%","%"+q+"%","%"+q+"%","%"+q+"%")
+    else:
+        result = []
+    print(result)
+    return result
 
 
 @app.route("/eqregister", methods=["GET", "POST"])

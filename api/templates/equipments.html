@@ -13,9 +13,14 @@
           <div class="col-md-8">
             <div class="search d-flex justify-content-center align-items-center">
               <i class="fa fa-search"></i>
-              <input type="search" class="form-control p-2" placeholder="Search for Equipments">
-              <button class="btn btn-primary">Search</button>
+              <input id="search" class="form-control p-2 w-75" placeholder="Search for Equipments">
+              <!--<button class="btn btn-primary">Search</button>-->
             </div>          
+          </div>
+          <div class="col-md-8 d-flex justify-content-center align-items-center">
+            <div class="searchresults p-2 w-75">
+                <p id="searchresults"></p>
+              </div>
           </div>
         </div>
     </div>
@@ -92,8 +97,7 @@
 
 {% block script%}
 <script>
-    function submit() {
-        document.getElementById('form-element').submit()
-    }
+  
+
 </script>
 {% endblock%}
